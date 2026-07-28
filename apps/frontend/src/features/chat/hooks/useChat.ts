@@ -12,7 +12,14 @@ export function useChat() {
         },
     ]);
 
-    function sendMessage(content: string) {
+    const [isLoading, setIsLoading] = useState(false);
+
+    async function sendMessage(content: string) {
+
+        if (!content.trim()) return;
+
+        if (isLoading) return;
+
         const userMessage: ChatMessage = {
             id: crypto.randomUUID(),
             role: "user",
@@ -20,23 +27,35 @@ export function useChat() {
             createdAt: new Date(),
         };
 
-        setMessages((previous) => [...previous, userMessage]);
+        setMessages(previous => [...previous, userMessage]);
 
-        setTimeout(() => {
-            const assistantMessage: ChatMessage = {
-                id: crypto.randomUUID(),
-                role: "assistant",
-                content:
-                    "This is a mock response. In the next sprint I'll be connected to our backend.",
-                createdAt: new Date(),
-            };
+        setIsLoading(true);
 
-            setMessages((previous) => [...previous, assistantMessage]);
-        }, 500);
+        //
+        // Temporary delay
+        // Later this becomes:
+        //
+        // const response = await chatService.sendMessage(...)
+        //
+
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        const assistantMessage: ChatMessage = {
+            id: crypto.randomUUID(),
+            role: "assistant",
+            content:
+                "This is a mock AI response. Soon this will come from the OpenAI API.",
+            createdAt: new Date(),
+        };
+
+        setMessages(previous => [...previous, assistantMessage]);
+
+        setIsLoading(false);
     }
 
     return {
         messages,
         sendMessage,
+        isLoading,
     };
 }
