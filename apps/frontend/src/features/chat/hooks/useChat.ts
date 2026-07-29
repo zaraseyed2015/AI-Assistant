@@ -2,6 +2,8 @@ import { useState } from "react";
 
 import type { ChatMessage } from "../types/chat.types";
 
+import { sendChatMessage } from "../services/chat.service";
+
 export function useChat() {
     const [messages, setMessages] = useState<ChatMessage[]>([
         {
@@ -15,10 +17,9 @@ export function useChat() {
     const [isLoading, setIsLoading] = useState(false);
 
     async function sendMessage(content: string) {
-
-        if (!content.trim()) return;
-
-        if (isLoading) return;
+        if (!content.trim() || isLoading) {
+            return;
+        }
 
         const userMessage: ChatMessage = {
             id: crypto.randomUUID(),
@@ -27,30 +28,43 @@ export function useChat() {
             createdAt: new Date(),
         };
 
-        setMessages(previous => [...previous, userMessage]);
+        setMessages((previous) => [
+            ...previous,
+            userMessage,
+        ]);
 
         setIsLoading(true);
 
-        //
-        // Temporary delay
-        // Later this becomes:
-        //
-        // const response = await chatService.sendMessage(...)
-        //
+        try {
+            const response = await sendChatMessage(content);
 
-        await new Promise(resolve => setTimeout(resolve, 1500));
+            const assistantMessage: ChatMessage = {
+                id: crypto.randomUUID(),
+                role: "assistant",
+                content: response.data.content,
+                createdAt: new Date(),
+            };
 
-        const assistantMessage: ChatMessage = {
-            id: crypto.randomUUID(),
-            role: "assistant",
-            content:
-                "This is a mock AI response. Soon this will come from the OpenAI API.",
-            createdAt: new Date(),
-        };
+            setMessages((previous) => [
+                ...previous,
+                assistantMessage,
+            ]);
+        } catch {
+            const assistantMessage: ChatMessage = {
+                id: crypto.randomUUID(),
+                role: "assistant",
+                content:
+                    "Sorry, I couldn't reach the AI service. Please try again.",
+                createdAt: new Date(),
+            };
 
-        setMessages(previous => [...previous, assistantMessage]);
-
-        setIsLoading(false);
+            setMessages((previous) => [
+                ...previous,
+                assistantMessage,
+            ]);
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     return {

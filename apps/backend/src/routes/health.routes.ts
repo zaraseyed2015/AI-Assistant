@@ -1,11 +1,9 @@
 import { Router } from "express";
-
 import { successResponse } from "../lib/api-response.js";
 
 const router = Router();
 
-router.get("/health", (_request, response) => {
-
+router.get("/", (_request, response) => {
     response.json(
         successResponse(
             {
@@ -17,7 +15,6 @@ router.get("/health", (_request, response) => {
             "Backend is healthy",
         ),
     );
-
 });
 
 export default router;

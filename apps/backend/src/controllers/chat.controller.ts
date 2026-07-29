@@ -4,7 +4,10 @@ import type {
     NextFunction,
 } from "express";
 
-import { successResponse } from "../lib/api-response.js";
+import {
+    successResponse,
+    errorResponse,
+} from "../lib/api-response.js";
 
 import { chatService } from "../services/chat.service.js";
 
@@ -13,27 +16,18 @@ import type {
 } from "../types/chat.types.js";
 
 export async function sendMessage(
-
     request: Request<{}, {}, ChatRequest>,
-
     response: Response,
-
     next: NextFunction,
-
 ) {
     try {
 
         const { message } = request.body;
 
         if (!message?.trim()) {
-
             response.status(400).json(
-                successResponse(
-                    null,
-                    "Message cannot be empty",
-                ),
+                errorResponse("Message cannot be empty"),
             );
-
             return;
         }
 
