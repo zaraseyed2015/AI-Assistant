@@ -5,6 +5,7 @@ import type { ChatMessage } from "../types/chat.types";
 import { sendChatMessage } from "../services/chat.service";
 
 export function useChat() {
+
     const [messages, setMessages] = useState<ChatMessage[]>([
         {
             id: crypto.randomUUID(),
@@ -17,6 +18,7 @@ export function useChat() {
     const [isLoading, setIsLoading] = useState(false);
 
     async function sendMessage(content: string) {
+
         if (!content.trim() || isLoading) {
             return;
         }
@@ -28,6 +30,7 @@ export function useChat() {
             createdAt: new Date(),
         };
 
+        // Update the UI immediately
         setMessages((previous) => [
             ...previous,
             userMessage,
@@ -36,7 +39,19 @@ export function useChat() {
         setIsLoading(true);
 
         try {
-            const response = await sendChatMessage(content);
+
+            // Build the complete conversation
+            const conversation = [
+                ...messages,
+                userMessage,
+            ].map((message) => ({
+                role: message.role,
+                content: message.content,
+            }));
+
+            const response = await sendChatMessage(
+                conversation,
+            );
 
             const assistantMessage: ChatMessage = {
                 id: crypto.randomUUID(),
@@ -49,7 +64,9 @@ export function useChat() {
                 ...previous,
                 assistantMessage,
             ]);
+
         } catch {
+
             const assistantMessage: ChatMessage = {
                 id: crypto.randomUUID(),
                 role: "assistant",
@@ -62,8 +79,11 @@ export function useChat() {
                 ...previous,
                 assistantMessage,
             ]);
+
         } finally {
+
             setIsLoading(false);
+
         }
     }
 
@@ -72,4 +92,5 @@ export function useChat() {
         sendMessage,
         isLoading,
     };
+
 }

@@ -1,20 +1,17 @@
 import { api } from "../../../lib/api";
 
-export interface ChatApiResponse {
-    success: boolean;
-    message: string;
-    data: {
-        content: string;
-        provider: string;
-        model: string;
-    };
-}
+import type {
+    ChatApiResponse,
+    ChatMessage,
+} from "../types/chat.types";
 
-export async function sendChatMessage(message: string) {
+export async function sendChatMessage(
+    messages: Pick<ChatMessage, "role" | "content">[],
+) {
     const response = await api.post<ChatApiResponse>(
         "/chat",
         {
-            message,
+            messages,
         },
     );
 

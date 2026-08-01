@@ -1,16 +1,21 @@
-import type { ChatCompletion } from "../types/chat.types.js";
+import type {
+    ChatCompletion,
+    ChatMessage,
+} from "../types/chat.types.js";
 
 import { ProviderFactory } from "../providers/provider.factory.js";
 
 export class ChatService {
 
     async sendMessage(
-        message: string,
+        messages: ChatMessage[],
     ): Promise<ChatCompletion> {
 
         const provider = ProviderFactory.getProvider();
 
-        return provider.generateResponse(message);
+        return provider.generateResponse(
+            messages,
+        );
 
     }
 

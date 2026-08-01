@@ -1,7 +1,12 @@
-import type { ChatCompletion } from "../types/chat.types.js";
+import type {
+    ChatCompletion,
+    ChatMessage,
+} from "../types/chat.types.js";
 
 export interface AIProvider {
+
     generateResponse(
-        message: string,
+        messages: ChatMessage[],
     ): Promise<ChatCompletion>;
+
 }

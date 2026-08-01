@@ -22,17 +22,33 @@ export async function sendMessage(
 ) {
     try {
 
-        const { message } = request.body;
+        const { messages } = request.body;
 
-        if (!message?.trim()) {
+        if (!messages || messages.length === 0) {
             response.status(400).json(
-                errorResponse("Message cannot be empty"),
+                errorResponse("Messages cannot be empty"),
             );
             return;
         }
 
+        console.log("");
+
+        console.log("========== REQUEST ==========");
+
+        console.log(
+            "History Length:",
+            messages.length,
+        );
+
+        console.log(
+            "History:",
+            messages,
+        );
+
+        console.log("=============================");
+
         const completion =
-            await chatService.sendMessage(message);
+            await chatService.sendMessage(messages);
 
         response.json(
             successResponse(
