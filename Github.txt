@@ -7,3 +7,9 @@ git push -u origin master
 git add Github.txt
 git commit -m "Add Github.txt"
 git push
+
+------------------
+git checkout -b feature/streaming-chat
+git checkout master
+git merge feature/streaming-chat
+git push origin master
