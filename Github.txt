@@ -3,3 +3,7 @@ git remote add origin https://github.com/<username>/AI-Assistant.git
 git branch -M master
 
 git push -u origin master
+--------------
+git add Github.txt
+git commit -m "Add Github.txt"
+git push
