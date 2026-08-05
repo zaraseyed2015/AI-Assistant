@@ -13,9 +13,17 @@ export class ChatService {
 
         const provider = ProviderFactory.getProvider();
 
-        return provider.generateResponse(
-            messages,
-        );
+        return provider.generateResponse(messages);
+
+    }
+
+    streamMessage(
+        messages: ChatMessage[],
+    ): AsyncGenerator<string> {
+
+        const provider = ProviderFactory.getProvider();
+
+        return provider.generateStream(messages);
 
     }
 

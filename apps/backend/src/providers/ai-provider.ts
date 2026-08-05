@@ -9,4 +9,8 @@ export interface AIProvider {
         messages: ChatMessage[],
     ): Promise<ChatCompletion>;
 
+    generateStream(
+        messages: ChatMessage[],
+    ): AsyncGenerator<string>;
+
 }

@@ -2,7 +2,9 @@ import { useState } from "react";
 
 import type { ChatMessage } from "../types/chat.types";
 
-import { sendChatMessage } from "../services/chat.service";
+import {
+    streamChatMessage,
+} from "../services/chat.service";
 
 export function useChat() {
 
@@ -19,9 +21,7 @@ export function useChat() {
 
     async function sendMessage(content: string) {
 
-        if (!content.trim() || isLoading) {
-            return;
-        }
+        if (!content.trim() || isLoading) return;
 
         const userMessage: ChatMessage = {
             id: crypto.randomUUID(),
@@ -30,67 +30,86 @@ export function useChat() {
             createdAt: new Date(),
         };
 
-        // Update the UI immediately
+        const assistantId =
+            crypto.randomUUID();
+
+        const assistantMessage: ChatMessage = {
+            id: assistantId,
+            role: "assistant",
+            content: "",
+            createdAt: new Date(),
+        };
+
+        const conversation = [
+            ...messages,
+            userMessage,
+        ].map(({ role, content }) => ({
+            role,
+            content,
+        }));
+
         setMessages((previous) => [
             ...previous,
             userMessage,
+            assistantMessage,
         ]);
 
         setIsLoading(true);
 
         try {
 
-            // Build the complete conversation
-            const conversation = [
-                ...messages,
-                userMessage,
-            ].map((message) => ({
-                role: message.role,
-                content: message.content,
-            }));
-
-            const response = await sendChatMessage(
+            await streamChatMessage(
                 conversation,
+                (chunk) => {
+
+                    setMessages((previous) =>
+                        previous.map((message) =>
+
+                            message.id === assistantId
+                                ? {
+                                    ...message,
+                                    content:
+                                        message.content +
+                                        chunk,
+                                }
+                                : message,
+                        ),
+                    );
+
+                },
             );
-
-            const assistantMessage: ChatMessage = {
-                id: crypto.randomUUID(),
-                role: "assistant",
-                content: response.data.content,
-                createdAt: new Date(),
-            };
-
-            setMessages((previous) => [
-                ...previous,
-                assistantMessage,
-            ]);
 
         } catch {
 
-            const assistantMessage: ChatMessage = {
-                id: crypto.randomUUID(),
-                role: "assistant",
-                content:
-                    "Sorry, I couldn't reach the AI service. Please try again.",
-                createdAt: new Date(),
-            };
+            setMessages((previous) =>
+                previous.map((message) =>
 
-            setMessages((previous) => [
-                ...previous,
-                assistantMessage,
-            ]);
+                    message.id === assistantId
+                        ? {
+                            ...message,
+                            content:
+                                "Sorry, I couldn't reach the AI service.",
+                        }
+                        : message,
+                ),
+            );
 
         } finally {
 
             setIsLoading(false);
 
         }
+
     }
 
     return {
+
         messages,
+
         sendMessage,
+
         isLoading,
+
     };
 
 }

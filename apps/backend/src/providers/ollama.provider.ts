@@ -73,4 +73,30 @@ export class OllamaProvider implements AIProvider {
 
     }
 
+    async *generateStream(
+        messages: ChatMessage[],
+    ): AsyncGenerator<string> {
+
+        const stream = await this.client.chat({
+
+            model: env.OLLAMA_MODEL,
+
+            messages,
+
+            stream: true,
+
+        });
+
+        for await (const chunk of stream) {
+
+            if (chunk.message?.content) {
+
+                yield chunk.message.content;
+
+            }
+
+        }
+
+    }
+
 }

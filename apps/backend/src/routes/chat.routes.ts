@@ -1,9 +1,14 @@
 import { Router } from "express";
 
-import { sendMessage } from "../controllers/chat.controller.js";
+import {
+    sendMessage,
+    streamMessage,
+} from "../controllers/chat.controller.js";
 
 const router = Router();
 
 router.post("/", sendMessage);
+
+router.post("/stream", streamMessage);
 
 export default router;
